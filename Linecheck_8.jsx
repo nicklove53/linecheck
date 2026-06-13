@@ -2476,7 +2476,7 @@ function SavingsCalc({ C, onStart, onDemo }) {
   const [ordersPerWeek,  setOrdersPerWeek]  = useState(1);
   const [savingsPct,     setSavingsPct]     = useState(4);
   const [minutesPerOrder,setMinutesPerOrder]= useState(45);
-  const [hourlyRate,     setHourlyRate]     = useState(25);
+  const [hourlyRate,     setHourlyRate]     = useState('25');
   const [days,           setDays]           = useState(90);
 
   const spend    = parseFloat(String(weeklySpend).replace(/[^0-9.]/g,'')) || 0;
@@ -2484,7 +2484,8 @@ function SavingsCalc({ C, onStart, onDemo }) {
   const orders   = Math.round(weeks * ordersPerWeek);
   const orderSav = spend * weeks * (savingsPct / 100);
   const totalHrs = (minutesPerOrder / 60) * orders;
-  const laborSav = totalHrs * hourlyRate;
+  const _rate    = parseFloat(String(hourlyRate)) || 0;
+  const laborSav = totalHrs * _rate;
   const total    = orderSav + laborSav;
   const monthly  = total / (days / 30);
   const hasData  = spend > 0;
@@ -2589,7 +2590,8 @@ function SavingsCalc({ C, onStart, onDemo }) {
                 {label('Hourly value of your time','Your wage or what you\'d pay someone to do this')}
                 <div style={{position:'relative'}}>
                   <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:C.sub,fontSize:15}}>$</span>
-                  <input type="number" value={hourlyRate} onChange={e=>setHourlyRate(Math.max(1,parseInt(e.target.value)||25))}
+                  <input type="number" value={hourlyRate} onChange={e=>setHourlyRate(e.target.value)}
+                      onBlur={e=>{const v=parseFloat(e.target.value);setHourlyRate(isNaN(v)||v<1?'25':String(v));}}
                     style={{...inp,paddingLeft:26}}/>
                 </div>
               </div>
@@ -2626,7 +2628,7 @@ function SavingsCalc({ C, onStart, onDemo }) {
                     <div style={{fontSize:11,color:C.sub,textTransform:'uppercase',letterSpacing:1,marginBottom:6}}>Labor savings</div>
                     <div style={{fontFamily:'monospace',fontWeight:900,fontSize:28,color:C.acc,letterSpacing:-1}}>{$(laborSav)}</div>
                     <div style={{fontSize:11,color:C.sub,marginTop:4}}>
-                      {minutesPerOrder} min × {orders} orders = {totalHrs.toFixed(1)} hrs @ ${hourlyRate}/hr
+                      {minutesPerOrder} min × {orders} orders = {totalHrs.toFixed(1)} hrs @ ${_rate}/hr
                     </div>
                   </div>
 
